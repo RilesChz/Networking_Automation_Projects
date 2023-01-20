@@ -1,0 +1,5 @@
+type,hostIP
+cisco_ios, 192.168.0.70
+cisco_ios, 192.168.0.71
+cisco_ios, 192.168.0.73
+cisco_ios, 192.168.0.74
