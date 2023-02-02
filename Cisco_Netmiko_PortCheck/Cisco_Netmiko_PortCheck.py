@@ -4,6 +4,13 @@ import csv
 import pyinputplus
 
 def device_connector(input_type):
+    if input_type == 'MAC':
+        sent_command = [f"show mac address-table interface"]
+    else:
+        sent_command = [f"show ip arp"]
+
+    output = []
+
     for row in inventory:
         net_connect = ConnectHandler(device_type=row['type'], host=row['hostIP'], username="admin",
                                      password=cisco_password)
@@ -11,14 +18,10 @@ def device_connector(input_type):
         router_interfaces = re.findall("Ethernet\d.\d", net_connect.send_command("show ip interface brief"))
 
         for interface in router_interfaces:
-            if input_type == 'MAC':
-                sent_command = [f"show mac address-table interface {interface}"]
-                if user_input in net_connect.send_command(sent_command):
-                    return row['hostname'], interface
-            else:
-                sent_command = [f"show ip arp {interface}"]
-                if user_input in net_connect.send_command(sent_command):
-                    return row['hostname'], interface
+            if user_input in net_connect.send_command(sent_command + ' ' + interface):
+                output.append('Found on device ' + row['hostname'] + ' port ' + interface)
+
+    return output
 
 
 
@@ -44,7 +47,7 @@ while True:
     if SearchReturn == '':
         print('Could Not find that MAC/IP')
     else:
-        print(f'Found on device {SearchReturn(1)}, port {SearchReturn(2)}')
+        print(SearchReturn)
 
     if pyinputplus.inputYesNo('Do you want to search again? [yes/no]') == 'no':
         break
