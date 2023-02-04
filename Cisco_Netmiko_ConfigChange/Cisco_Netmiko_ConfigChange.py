@@ -2,7 +2,7 @@ from netmiko import ConnectHandler
 import re
 import csv
 
-inventory = csv.DictReader(open('DeviceList'))
+inventory = csv.DictReader(open('DeviceList.csv'))
 cisco_password = input('Please enter your password')  # Take password as input so don't have to store it in the code
 
 

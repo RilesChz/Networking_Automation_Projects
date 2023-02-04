@@ -1,6 +1,6 @@
-hostname, type,hostIP
-CISCO-SW-1, cisco_ios, 192.168.0.69
+hostname, type, hostIP
 CISCO-RT-1, cisco_ios, 192.168.0.70
+CISCO-RT-2, cisco_ios, 192.168.0.75
 CISCO-RT-3, cisco_ios, 192.168.0.71
 CISCO-RT-4, cisco_ios, 192.168.0.73
 CISCO-RT-5, cisco_ios, 192.168.0.74
