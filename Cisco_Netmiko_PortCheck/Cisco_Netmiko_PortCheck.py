@@ -6,24 +6,28 @@ import pyinputplus
 def device_connector(input_type):
     if input_type == 'MAC':     #change the command depending on input type
         sent_command = 'show mac address-table interface'
-    elif input_type == 'IP':
+    else:
         sent_command = 'show ip arp'
-
-    output = []
-
-
 
     for row in inventory:     #iterate through the device list
         try:
             net_connect = netmiko.ConnectHandler(device_type=row['OStype'], host=row['hostIP'], username='admin', password=cisco_password)
-        except netmiko.exceptions:
+            device_interfaces = re.findall('Ethernet\d.\d', net_connect.send_command("show ip interface brief"))  # scrape the list of interfaces to check
+
+            for interface in device_interfaces:
+                if interface == 'Ethernet0/0' or 'Ethernet0/1':
+                   pass #do nothing, as these ports are uplinks on each device
+                else:
+                    if user_input in net_connect.send_command(f'{sent_command} {interface}'):
+                        output = ('Found on device ' + row['hostname'] + ' port ' + interface)
+
+
+        except netmiko.exceptions.NetmikoTimeoutException:  #If the connection to a device fails, don't crash the program
             print(f'Failed to connect to {row["hostname"]}')
 
-        router_interfaces = re.findall('Ethernet\d.\d', net_connect.send_command("show ip interface brief"))  # scrape the list of interfaces to check
+    if output is None:
+        output = 'Could not locate that IP/MAC'
 
-        for interface in router_interfaces:
-            if user_input in net_connect.send_command(f'{sent_command} {interface}'):
-                output.append('Found on device ' + row['hostname'] + ' port ' + interface)
     return output
 
 
