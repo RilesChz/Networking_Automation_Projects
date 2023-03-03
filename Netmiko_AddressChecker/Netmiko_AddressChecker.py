@@ -1,6 +1,5 @@
 import netmiko
 import re
-import csv
 import pynetbox
 
 nb = pynetbox.api(     #access netbox API
@@ -16,7 +15,7 @@ def device_connector(input_type):
     else:
         sent_command = 'show ip arp'
 
-    inventory = nb.dcim.devices.all()  # make a list out of the netbox device objects
+    inventory = list(nb.dcim.devices.all())  # make a list out of the netbox device objects
 
     for device in inventory:
         try:
@@ -28,7 +27,7 @@ def device_connector(input_type):
 
             for interface in device_interfaces:
                 if interface == 'Ethernet0/0' or 'Ethernet0/1':
-                    pass
+                    pass   #do nothing, as these are uplinks
                 else:
                     if user_input in net_connect.send_command(f'{sent_command} {interface}'):   #send the MAC/ARP command to the interface
                         output = ('Found on device ' + device.name + ' port ' + interface)
