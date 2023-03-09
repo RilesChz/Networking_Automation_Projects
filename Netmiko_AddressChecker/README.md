@@ -20,3 +20,4 @@ Assumptions:
 1 - The routers in netbox are Cisco IOS with the interface format EthernetxX/X
 
 2 - The switches in netbox are Arista vEOS with the interface format EthernetX
+

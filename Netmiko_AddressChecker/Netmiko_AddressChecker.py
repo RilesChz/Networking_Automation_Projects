@@ -15,11 +15,11 @@ def device_connector(input_type):
     else:
         sent_command = 'show ip arp'
 
-    inventory = list(nb.dcim.devices.all())  # make a list out of the netbox device objects
+    inventory = nb.dcim.devices.all() # make a list out of the netbox device objects
 
     for device in inventory:
         try:
-            net_connect = netmiko.ConnectHandler(device_type=device.platform.slug, host=device.primary_ip.dns_name, username='admin', password=cisco_password)
+            net_connect = netmiko.ConnectHandler(device_type=device.platform.slug, host=device.primary_ip.dns_name, username='admin', password=password_input)
            #^ connects to the device, using the devices attributes from the netbox API
 
             device_interfaces = re.findall('Ethernet\d.\d', net_connect.send_command("show ip interface brief"))
@@ -46,7 +46,7 @@ def device_connector(input_type):
 ip_regex = re.compile(r'^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$')
 mac_regex = re.compile(r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
 
-cisco_password = input('Please enter your password \n')  #Take password as input so don't have to store it in the code
+password_input = input('Please enter your password \n')  #Take password as input so don't have to store it in the code
 
 while True:
         user_input = input('Please enter an IP or MAC Address to search for \n')  #Validate input is an IP or MAC
