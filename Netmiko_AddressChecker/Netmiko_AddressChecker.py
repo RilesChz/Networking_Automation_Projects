@@ -37,7 +37,7 @@ def device_connector(input_type):
                 for interface in device_interfaces:
                     if interface != 'Ethernet0/0' or 'Ethernet0/1' or 'Ethernet11' or 'Ethernet12':   #do not check these as they are uplinks
                         if user_input in net_connect.send_command(f'{sent_command} {interface}'):  # send the MAC/ARP command to the interface
-                          output = ('Found on device ' + device.name + ' port ' + interface)
+                          output = ('Found on device ' + device.name + ' interface ' + interface)
 
                 print(f'checked {device.name}')
         except netmiko.exceptions.NetmikoTimeoutException:  # If the connection to a device fails, don't crash the program
