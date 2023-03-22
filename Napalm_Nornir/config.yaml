@@ -1,0 +1,8 @@
+---
+inventory:
+  plugin: NetBoxInventory2
+  options:
+     nb_url: 'http://192.168.0.246'
+     nb_token: 'b64df0884421551e0b7b2395a995d2dd3ad9dfb5'
+     filter parameters:
+       platform: 'cisco_ios'
