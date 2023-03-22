@@ -19,6 +19,8 @@ def device_connector(input_type):
     inventory = list(nb.dcim.devices.all())  # make a list out of the netbox device objects]
     output = None
 
+
+
     for device in inventory:
         try:
             if device.status.value == 'active':  # Only attempt connection if it is an active device
@@ -29,9 +31,9 @@ def device_connector(input_type):
                 # ^ connects to the device, using the devices attributes from the netbox API
 
                 if device.platform.slug == 'cisco_ios':
-                    device_interfaces = re.findall('Ethernet\d.\d', net_connect.send_command_timing("show ip interface brief"))
+                    device_interfaces = re.findall('Ethernet\d.\d', net_connect.send_command("show ip interface brief"))
                 elif device.platform.slug == 'arista_eos':
-                    device_interfaces = re.findall('Ethernet\d', net_connect.send_command_timing("show ip interface brief"))
+                    device_interfaces = re.findall('Ethernet\d', net_connect.send_command("show ip interface brief"))
                     # ^ scrape the list of interfaces to check
 
                 for interface in device_interfaces:
