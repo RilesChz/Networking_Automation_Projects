@@ -1,5 +1,6 @@
 import netmiko
 import re
+import threading
 import pynetbox
 
 nb = pynetbox.api(  # access netbox API
@@ -7,42 +8,35 @@ nb = pynetbox.api(  # access netbox API
     token='b64df0884421551e0b7b2395a995d2dd3ad9dfb5'
 )
 
-
 # ---------------------------------------------------------
 
 def device_connector(input_type):
     if input_type == 'MAC':  # change the command depending on input type
         sent_command = 'show mac address-table interface'
-    else:
+    elif input_type == 'IP':
         sent_command = 'show ip arp'
 
-    inventory = list(nb.dcim.devices.all())  # make a list out of the netbox device objects]
     output = None
 
+    try:
+        net_connect = netmiko.ConnectHandler(device_type=device.platform.name,
+                                             host=device.name,
+                                             username='admin', password=password_input)
+        # ^ connects to the device, using the devices attributes from the netbox API
 
 
-    for device in inventory:
-        try:
-            if device.status.value == 'active':  # Only attempt connection if it is an active device
+        interface_list = list(nb.dcim.interfaces.filter(device=device.name))
 
-                net_connect = netmiko.ConnectHandler(device_type=device.platform.slug,
-                                                     host=device.primary_ip.dns_name,
-                                                     username='admin', password=password_input)
-                # ^ connects to the device, using the devices attributes from the netbox API
+        for interface in interface_list:
+         if 'Uplink' not in interface.description:  #do not check interface if it's an uplink
+          if device.platform.name == 'cisco_ios' or 'arista_eos':
+           if user_input in net_connect.send_command(f'{sent_command} {interface}'):  # send the MAC/ARP command to the interface
+            output = ('Found on device ' + device.name + ' interface ' + interface)
 
-                if device.platform.slug == 'cisco_ios':
-                    device_interfaces = re.findall('Ethernet\d.\d', net_connect.send_command("show ip interface brief"))
-                elif device.platform.slug == 'arista_eos':
-                    device_interfaces = re.findall('Ethernet\d', net_connect.send_command("show ip interface brief"))
-                    # ^ scrape the list of interfaces to check
+            # elif device.platform.name == junos
+            print(f'checked {device.name}')
 
-                for interface in device_interfaces:
-                    if interface != 'Ethernet0/0' or 'Ethernet0/1' or 'Ethernet11' or 'Ethernet12':   #do not check these as they are uplinks
-                        if user_input in net_connect.send_command(f'{sent_command} {interface}'):  # send the MAC/ARP command to the interface
-                          output = ('Found on device ' + device.name + ' interface ' + interface)
-
-                print(f'checked {device.name}')
-        except netmiko.exceptions.NetmikoTimeoutException:  # If the connection to a device fails, don't crash the program
+    except netmiko.exceptions.NetmikoTimeoutException:  # If the connection to a device fails, don't crash the program
             print(f'Failed to connect to {device.name}')
 
     if output is None:
@@ -58,13 +52,28 @@ mac_regex = re.compile(r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
 
 password_input = input('Please enter your password \n')  # Take password as input so don't have to store it in the code
 
-while True:
-    user_input = input('Please enter an IP or MAC Address to search for \n')  # Validate input is an IP or MAC
-    if ip_regex.search(user_input) is not None:
-        print(device_connector('IP'))
-        break
-    elif mac_regex.search(user_input) is not None:
-        print(device_connector('MAC'))
-        break
-    else:
-        print('That is not a valid IP or MAC Address')
+#while True:
+ #   user_input = input('Please enter an IP or MAC Address to search for \n')  # Validate input is an IP or MAC
+   # if ip_regex.search(user_input) is not None:
+    #    print(device_connector('IP'))
+     #   break
+    #elif mac_regex.search(user_input) is not None:
+     #   print(device_connector('MAC'))
+      #  break
+    #else:
+     #   print('That is not a valid IP or MAC Address')
+
+
+user_input = input('Please enter an IP or MAC Address to search for \n')  # Validate input is an IP or MAC
+
+device_inventory = list(nb.dcim.devices.all())  # make a list out of the netbox device objects
+
+threads_list = []
+for device in device_inventory:
+    if device.status.value == 'active':  # Only attempt connection if it is an active device
+        threads_list.append(threading.Thread(target=device_connector, args=('IP',)))
+
+for thread in threads_list:
+ thread.start()  # start the threading
+for thread in threads_list:
+  thread.join()  # wait for threading to finish
