@@ -8,6 +8,7 @@ nb = pynetbox.api(  # access netbox API
     token='b64df0884421551e0b7b2395a995d2dd3ad9dfb5'
 )
 
+
 # ---------------------------------------------------------
 
 def device_connector(device, input_type):
@@ -22,15 +23,15 @@ def device_connector(device, input_type):
                                              username='admin', password=password_input)
         # ^ connects to the device, using the devices attributes from the netbox API
 
-
         interface_list = list(nb.dcim.interfaces.filter(device=device.name))
 
         for interface in interface_list:
-         if 'Uplink' not in interface.description:  #do not check interface if it's an uplink
-          if device.platform.name == 'cisco_ios' or 'arista_eos':
-           if user_input in net_connect.send_command(f'{sent_command} {interface}'):  # send the MAC/ARP command to the interface
-               print(f'Found on device {device.name} interface {interface.name}')
-               return
+            if 'Uplink' not in interface.description:  # do not check interface if it's an uplink
+                if device.platform.name == 'cisco_ios' or 'arista_eos':
+                    if user_input in net_connect.send_command(
+                            f'{sent_command} {interface}'):  # send the MAC/ARP command to the interface
+                        print(f'Found on device {device.name} interface {interface.name}')
+                        return
 
         print(f'Not found on {device.name}')
         net_connect.disconnect()
@@ -67,6 +68,6 @@ for device in device_inventory:
         threads_list.append(threading.Thread(target=device_connector, args=(device, input_type,)))
 
 for thread in threads_list:
- thread.start()  # start the threading
+    thread.start()  # start the threading
 for thread in threads_list:
-  thread.join()  # wait for threading to finish
+    thread.join()  # wait for threading to finish
