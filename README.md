@@ -1,3 +1,3 @@
-# Automation_Projects
+# Networking_Automation_Projects
 
-Projects for automating network and cloud environments via Python
+Projects for automating network environments via Python
