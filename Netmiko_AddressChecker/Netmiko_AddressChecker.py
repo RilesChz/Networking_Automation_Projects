@@ -2,11 +2,9 @@ import netmiko
 import re
 import threading
 import pynetbox
+import credentials
 
-nb = pynetbox.api(  # access netbox API
-    'http://192.168.0.246',
-    token='b64df0884421551e0b7b2395a995d2dd3ad9dfb5'
-)
+nb = pynetbox.api(credentials.NetBox_IP, token=credentials.NetBox_API)  # access the netbox API
 
 
 # ---------------------------------------------------------
