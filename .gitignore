@@ -2,7 +2,6 @@
 /shelf/
 /.idea/workspace.xml
 
-# API Keys / Secrets
-credentials.py
+# settings and logs
 .idea
 *.log
