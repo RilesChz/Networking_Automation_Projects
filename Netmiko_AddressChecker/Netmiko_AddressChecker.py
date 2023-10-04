@@ -2,10 +2,10 @@ import netmiko
 import re
 import threading
 import pynetbox
-import credentials
+import os
 
-nb = pynetbox.api(credentials.NetBox_IP, token=credentials.NetBox_API)  # access the netbox API
-
+nb = pynetbox.api(os.environ.get('NETBOX_IP'), token=os.environ.get('NETBOX_API'))
+# ^ Load the Netbox instance, using the environment variables of the host
 
 # ---------------------------------------------------------
 

@@ -2,22 +2,20 @@ import netmiko
 import re
 import threading
 import pynetbox
+import os
 
-nb = pynetbox.api(  # access netbox API
-    'http://192.168.0.246',
-    token='b64df0884421551e0b7b2395a995d2dd3ad9dfb5'
-)
+nb = pynetbox.api(os.environ.get('NETBOX_IP'), token=os.environ.get(
+    'NETBOX_API'))  # ^ Load the Netbox instance, using the environment variables of the host
+
 
 # ---------------------------------------------------------
 
 def device_connector(device):
-
     try:
         net_connect = netmiko.ConnectHandler(device_type=device.platform.name,
                                              host=device.name,
                                              username='admin', password=password_input)
         # ^ connects to the device, using the devices attributes from the netbox API
-
 
 
     except netmiko.exceptions.NetmikoTimeoutException:  # If the connection to a device fails, don't crash the program
@@ -38,6 +36,6 @@ for device in device_inventory:
     threads_list.append(threading.Thread(target=device_connector, args=(device,)))
 
 for thread in threads_list:
- thread.start()  # start the threading
+    thread.start()  # start the threading
 for thread in threads_list:
-  thread.join()  # wait for threading to finish
+    thread.join()  # wait for threading to finish
