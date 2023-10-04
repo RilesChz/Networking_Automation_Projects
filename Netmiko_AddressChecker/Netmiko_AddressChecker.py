@@ -35,7 +35,7 @@ def device_connector(device, input_type):
         net_connect.disconnect()
 
     except netmiko.exceptions.NetmikoTimeoutException:  # If the connection to a device fails, don't crash the program
-        print(f'Failed to connect to {device.name}')
+        print(f'Failed to connect to {device.name}', flush=True)
 
 
 # ---------------------------------------------------------
